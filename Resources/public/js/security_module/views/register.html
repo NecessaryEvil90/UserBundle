@@ -1,0 +1,27 @@
+<form name="fos_user_registration_form" method="post" action="/register">
+    <div class="form-group row">
+        <label class="control-label col-sm-2 required">Username</label>
+        <div class="col-sm-6">
+            <input type="text" id="fos_user_registration_form_username" name="fos_user_registration_form[username]" required="required" maxlength="255" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="control-label col-sm-2 required">Email</label>
+        <div class="col-sm-6">
+            <input type="email" id="fos_user_registration_form_email" name="fos_user_registration_form[email]" required="required" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="control-label col-sm-2 required">Password</label>
+        <div class="col-sm-6">
+            <input type="password" id="fos_user_registration_form_plainPassword_first" name="fos_user_registration_form[plainPassword][first]" required="required" class="form-control" />
+        </div>
+    </div>
+    <div class="form-group row">
+        <label class="control-label col-sm-2 required">Repeat password</label>
+        <div class="col-sm-6">
+            <input type="password" id="fos_user_registration_form_plainPassword_second" name="fos_user_registration_form[plainPassword][second]" required="required" class="form-control" />
+        </div>
+    </div>
+    <button class="btn btn-success" type="submit">Register!</button>
+</form>
