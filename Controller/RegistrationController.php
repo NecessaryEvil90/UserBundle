@@ -22,37 +22,35 @@ class RegistrationController extends BaseController
      */
     public function registerAction(Request $request)
     {
-        /** @var $formFactory \FOS\UserBundle\Form\Factory\FactoryInterface */
-        $formFactory = $this->get('fos_user.registration.form.factory');
-        /** @var $userManager \FOS\UserBundle\Model\UserManagerInterface */
-        $userManager = $this->get('fos_user.user_manager');
-        /** @var $dispatcher \Symfony\Component\EventDispatcher\EventDispatcherInterface */
-        $dispatcher = $this->get('event_dispatcher');
-        $user = $userManager->createUser();
-        $user->setEnabled(true);
-        $event = new GetResponseUserEvent($user, $request);
-        $dispatcher->dispatch(FOSUserEvents::REGISTRATION_INITIALIZE, $event);
-        if (null !== $event->getResponse()) {
-            return $event->getResponse();
-        }
-        $form = $formFactory->createForm();
-        $form->setData($user);
+        // 1) build the form
+        $user = new User();
+
+        $form = $this->createForm(new UserType(), $user);
+
+        // 2) handle the submit (will only happen on POST)
         $form->handleRequest($request);
-        if ($form->isValid()) {
-            $event = new FormEvent($form, $request);
-            $dispatcher->dispatch(FOSUserEvents::REGISTRATION_SUCCESS, $event);
-            $userManager->updateUser($user);
-            if (null === $response = $event->getResponse()) {
-                $url = $this->generateUrl('fos_user_registration_confirmed');
-                $response = new RedirectResponse($url);
-            }
-            $dispatcher->dispatch(FOSUserEvents::REGISTRATION_COMPLETED, new FilterUserResponseEvent($user, $request, $response));
-            return $response;
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            // 3) Encode the password (you could also do this via Doctrine listener)
+            $password = $this->get('security.password_encoder')
+                ->encodePassword($user, $user->getPlainPassword());
+            $user->setPassword($password);
+
+            // 4) save the User!
+            $em = $this->getDoctrine()->getManager();
+            $em->persist($user);
+            $em->flush();
+
+            // ... do any other work - like sending them an email, etc
+            // maybe set a "flash" success message for the user
+
+            return $this->redirectToRoute('/login');
         }
 
-        return $this->container->get('templating')->renderResponse('NEvilUserBundle:Registration:register_content.html.twig', array(
-            'form' => $form->createView(),
-        ));
+        return $this->render(
+            'NEvilUserBundle:Registration:register_content.html.twig',
+            array('form' => $form->createView())
+        );
     }
 
     private function getErrorMessages(\Symfony\Component\Form\Form $form) {

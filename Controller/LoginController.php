@@ -11,7 +11,7 @@ use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class LoginController extends BaseController
 {
-        /**
+    /**
      * Renders the login template with the given parameters. Overwrite this function in
      * an extended controller to provide additional data for the login template.
      *
